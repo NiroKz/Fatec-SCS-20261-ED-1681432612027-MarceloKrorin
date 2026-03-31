@@ -6,14 +6,21 @@
 * data: 30/03/2026 *
 *---------------------------------------------------------*
 '''
+
 def empilhar_valor(stack_numerica, valor):
-    stack_numerica.pop(0)
     stack_numerica.append(valor)
+    if len(stack_numerica) > 4:
+        stack_numerica.pop(0)
+
 
 def executar_operacao(stack_numerica, operador):
+    if len(stack_numerica) < 2:
+        print("Erro: operandos insuficientes")
+        return False
+
     operando2 = stack_numerica.pop()
     operando1 = stack_numerica.pop()
-    
+
     if operador == "+":
         resultado = operando1 + operando2
     elif operador == "-":
@@ -21,20 +28,23 @@ def executar_operacao(stack_numerica, operador):
     elif operador == "*":
         resultado = operando1 * operando2
     elif operador == "/":
+        if operando2 == 0:
+            print("Erro: divisão por zero")
+            return False
         resultado = operando1 / operando2
     else:
         print("Erro: operador inválido")
-        return
-    
-    topo = stack_numerica[0]
-    stack_numerica.insert(0, topo)
+        return False
+
     stack_numerica.append(resultado)
+    return True
+
 
 def exibir_stack(stack_numerica):
-    t = stack_numerica[0]
-    z = stack_numerica[1]
-    y = stack_numerica[2]
-    x = stack_numerica[3]
+    stack = [0, 0, 0, 0] + stack_numerica
+    stack = stack[-4:]
+
+    t, z, y, x = stack
 
     print(f"T: {t}")
     print(f"Z: {z}")
@@ -43,7 +53,8 @@ def exibir_stack(stack_numerica):
     print("--------")
 
 entrada_rpn = input("Digite a expressão RPN: ")
-stack_numerica = [0, 0, 0, 0]
+
+stack_numerica = []
 stack_expressao = []
 
 tokens = entrada_rpn.split()
@@ -60,7 +71,9 @@ for token in tokens:
             print("Erro: operandos insuficientes")
             break
 
-        executar_operacao(stack_numerica, token)
+        sucesso = executar_operacao(stack_numerica, token)
+        if not sucesso:
+            break
 
         exp2 = stack_expressao.pop()
         exp1 = stack_expressao.pop()
@@ -72,8 +85,8 @@ for token in tokens:
 
 if len(stack_expressao) > 1:
     print("Erro: operadores insuficientes")
-elif len(tokens) < 2:
+elif len(tokens) < 1:
     print("Erro: expressão inválida")
 else:
-    print(f"Expressão: {nova_expressao}")
-    print(f"Resultado: {stack_numerica[3]}")
+    print(f"Expressão: {stack_expressao[0]}")
+    print(f"Resultado: {stack_numerica[-1] if stack_numerica else 0}")
